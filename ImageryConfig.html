@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>ImageryConfig</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      padding: 5px 10px;
+      width: 225px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      background-color: #fff;
+      border-radius: 10px;
+    }
+
+    .el-slider {
+      display: inline-block;
+      width: 110px;
+      vertical-align: middle;
+      padding-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer">
+    <div id="app">
+      <div>
+        <span>影像透明度：</span>
+        <el-slider :step="0.1" :min="0" :max="1" v-model="alpha" @input="alphaInput"></el-slider>
+      </div>
+      <div><span>影像明亮度：</span>
+        <el-slider :step="1" :min="0" :max="10" v-model="brightness" @input="brightnessInput"></el-slider>
+      </div>
+      <div>
+        <span>影像对比度：</span>
+        <el-slider :step="1" :min="0" :max="10" v-model="contrast" @input="contrastInput"></el-slider>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Cesium.js"></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      })
+    })
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: function () {
+        return { alpha: 1, brightness: 1, contrast: 1 }
+      },
+      methods: {
+        alphaInput() {
+          viewer.scene.imageryLayers._layers[0].alpha = this.alpha
+        },
+        brightnessInput() {
+          viewer.scene.imageryLayers._layers[0].brightness = this.brightness
+        },
+        contrastInput() {
+          viewer.scene.imageryLayers._layers[0].contrast = this.contrast
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>
