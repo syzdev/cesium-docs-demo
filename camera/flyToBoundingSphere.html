@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>flyHome</title>
+  <title>flyToBoundingSphere</title>
   <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/cesium@1.92.0/Build/Cesium/Widgets/widgets.css'>
   <style>
@@ -20,7 +20,7 @@
 
     #app {
       padding: 20px;
-      width: 225px;
+      width: 365px;
       position: absolute;
       left: 10px;
       top: 10px;
@@ -35,9 +35,15 @@
 <body>
   <div id="cesiumContainer">
     <div id="app">
-      <div>提示：转动离开初始相机视角后，调整duration，再点击flyHome</div><br>
-      <el-input-number v-model="duration" :min="1" :max="5" label="duration" size="small"></el-input-number>
-      <el-button type="primary" @click="flyHome" size="small">flyHome</el-button>
+      <div>提示：点击下方按钮将相机视角定位到目标位置</div><br>
+      <el-button type="primary" @click="flyToBoundingSphere(-2177746.96692561,4388730.90052871,4070065.65595926,2)"
+        size="small">组合楼梯</el-button>
+      <el-button type="primary" @click="flyToBoundingSphere(-2177754.19114776,4388738.13353995,4070075.32468161, 14)"
+        size="small">屋顶楼板</el-button>
+      <el-button type="primary" @click="flyToBoundingSphere(-2177759.59650997,4388731.78844348,4070062.48392744, 2)"
+        size="small">组合外窗</el-button>
+      <el-button type="primary" @click="flyToBoundingSphere(-2177742.31707397,4388741.65087216,4070068.19651638, 2)"
+        size="small">门上楼板</el-button>
     </div>
   </div>
   <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
@@ -50,17 +56,23 @@
         url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
       })
     })
+    const tileset = viewer.scene.primitives.add(
+      new Cesium.Cesium3DTileset({
+        url: '../3dtiles/tlfs/tileset.json',
+      })
+    )
+    viewer.zoomTo(tileset, new Cesium.HeadingPitchRange(0, 0, 40))
+
   </script>
   <script>
     new Vue({
       el: '#app',
-      data: function () {
-        return { duration: 3 }
-      },
       methods: {
-        flyHome() {
-          viewer.camera.flyHome(this.duration)
-        }
+        flyToBoundingSphere(x, y, z, r) {
+          let center = new Cesium.Cartesian3(x, y, z)
+          let sphere = new Cesium.BoundingSphere(center, r)
+          viewer.camera.flyToBoundingSphere(sphere)
+        },
       },
     })
   </script>
