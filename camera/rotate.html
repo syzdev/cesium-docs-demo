@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>rotate</title>
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/cesium@1.92.0/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      padding: 20px;
+      width: 200px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      color: #fff;
+      background-color: rgba(40, 44, 50, 0.9);
+      border-radius: 10px;
+    }
+
+    .group {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .el-input {
+      width: 100px
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer">
+    <div id="app">
+      <div>提示：输入angle参数后点击按钮完成视角的旋转</div><br>
+      <div class="group">
+        <el-button type="primary" @click="rotateUp()" size="mini">rotateUp</el-button>
+        <el-input v-model="rotateUpAngle" size="mini"><template slot="append">°</template></el-input>
+      </div>
+      <div class="group">
+        <el-button type="primary" @click="rotateDown()" size="mini">rotateDown</el-button>
+        <el-input v-model="rotateDownAngle" size="mini"><template slot="append">°</template></el-input>
+      </div>
+      <div class="group">
+        <el-button type="primary" @click="rotateLeft()" size="mini">rotateLeft</el-button>
+        <el-input v-model="rotateLeftAngle" size="mini"><template slot="append">°</template></el-input>
+      </div>
+      <div class="group">
+        <el-button type="primary" @click="rotateRight()" size="mini">rotateRight</el-button>
+        <el-input v-model="rotateRightAngle" size="mini"><template slot="append">°</template></el-input>
+      </div>
+    </div>
+  </div>
+  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
+  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cesium@1.92.0/Build/Cesium/Cesium.js"></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      })
+    })
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          rotateUpAngle: 10,
+          rotateDownAngle: 10,
+          rotateLeftAngle: 10,
+          rotateRightAngle: 10,
+        }
+      },
+      methods: {
+        rotateUp() {
+          viewer.camera.rotateUp(Cesium.Math.toRadians(this.rotateUpAngle))
+        },
+        rotateDown() {
+          viewer.camera.rotateDown(Cesium.Math.toRadians(this.rotateDownAngle))
+        },
+        rotateLeft() {
+          viewer.camera.rotateLeft(Cesium.Math.toRadians(this.rotateLeftAngle))
+        },
+        rotateRight() {
+          viewer.camera.rotateRight(Cesium.Math.toRadians(this.rotateRightAngle))
+        },
+      },
+    })
+  </script>
+</body>
+
+</html>
