@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>zoom</title>
+  <title>move</title>
   <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/cesium@1.92.0/Build/Cesium/Widgets/widgets.css'>
   <style>
@@ -37,7 +37,7 @@
     }
 
     .el-input {
-      width: 100px
+      width: 80px
     }
   </style>
 </head>
@@ -45,14 +45,30 @@
 <body>
   <div id="cesiumContainer">
     <div id="app">
-      <div>提示：输入amount参数后点击按钮完成视角的缩放</div><br>
+      <div>提示：输入amount参数后点击按钮完成视角的移动</div><br>
       <div class="group">
-        <el-button type="primary" @click="zoomIn()" size="small">zoomIn</el-button>
-        <el-input v-model="zoomInAmount" size="small"></el-input>
+        <el-button type="primary" @click="moveForward()" size="small">moveForward</el-button>
+        <el-input v-model="moveForwardAmount" size="small"></el-input>
       </div>
       <div class="group">
-        <el-button type="primary" @click="zoomOut()" size="small">zoomOut</el-button>
-        <el-input v-model="zoomOutAmount" size="small"></el-input>
+        <el-button type="primary" @click="moveBackward()" size="small">moveBackward</el-button>
+        <el-input v-model="moveBackwardAmount" size="small"></el-input>
+      </div>
+      <div class="group">
+        <el-button type="primary" @click="moveLeft()" size="small">moveLeft</el-button>
+        <el-input v-model="moveLeftAmount" size="small"></el-input>
+      </div>
+      <div class="group">
+        <el-button type="primary" @click="moveRight()" size="small">moveRight</el-button>
+        <el-input v-model="moveRightAmount" size="small"></el-input>
+      </div>
+      <div class="group">
+        <el-button type="primary" @click="moveUp()" size="small">moveUp</el-button>
+        <el-input v-model="moveUpAmount" size="small"></el-input>
+      </div>
+      <div class="group">
+        <el-button type="primary" @click="moveDown()" size="small">moveDown</el-button>
+        <el-input v-model="moveDownAmount" size="small"></el-input>
       </div>
     </div>
   </div>
@@ -72,16 +88,32 @@
       el: '#app',
       data() {
         return {
-          zoomInAmount: 100000.0,
-          zoomOutAmount: 100000.0
+          moveForwardAmount: 100000.0,
+          moveBackwardAmount: 100000.0,
+          moveLeftAmount: 100000.0,
+          moveRightAmount: 100000.0,
+          moveUpAmount: 100000.0,
+          moveDownAmount: 100000.0,
         }
       },
       methods: {
-        zoomIn() {
-          viewer.camera.zoomIn(this.zoomInAmount)
+        moveForward() {
+          viewer.camera.moveForward(this.moveForwardAmount)
         },
-        zoomOut() {
-          viewer.camera.zoomOut(this.zoomOutAmount)
+        moveBackward() {
+          viewer.camera.moveBackward(this.moveBackwardAmount)
+        },
+        moveLeft() {
+          viewer.camera.moveLeft(this.moveLeftAmount)
+        },
+        moveRight() {
+          viewer.camera.moveRight(this.moveRightAmount)
+        },
+        moveUp() {
+          viewer.camera.moveUp(this.moveUpAmount)
+        },
+        moveDown() {
+          viewer.camera.moveDown(this.moveDownAmount)
         },
       },
     })
