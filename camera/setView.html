@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>setView</title>
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/cesium@1.92.0/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      padding: 20px;
+      width: 225px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      color: #fff;
+      background-color: rgba(40, 44, 50, 0.9);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer">
+    <div id="app">
+      <div>提示：点击下方按钮将相机视角定位到目标位置</div><br>
+      <el-button type="primary" @click="setView" size="small">setView 北京</el-button>
+    </div>
+  </div>
+  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
+  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cesium@1.92.0/Build/Cesium/Cesium.js"></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      })
+    })
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      methods: {
+        setView() {
+          viewer.camera.setView({
+            destination: Cesium.Cartesian3.fromDegrees(116.435314, 39.960521, 15000.0), // 设置位置，北京的坐标
+            orientation: {
+              heading: Cesium.Math.toRadians(20.0),
+              pitch: Cesium.Math.toRadians(-90.0),
+              roll: 0
+            }
+          })
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>
