@@ -40,7 +40,7 @@
 <body>
   <div id="cesiumContainer">
     <div id="app">
-      <div>提示：点击下方按钮将相机视角定位到目标位置</div><br>
+      <div>提示：点击下方按钮将相机视角定位到目标位置，定位后相机视角将被锁定，可通过“解除视角锁定”按钮解除锁定</div><br>
       <el-button type="primary" @click="lookAtCartesian3" size="small">北京天安门</el-button>
       <el-button type="primary" @click="lookAtHeadingPitchRange" size="small">武汉黄鹤楼</el-button>
       <el-button type="warning" @click="unlock" size="small" class="cancel-button">解除视角锁定</el-button>
