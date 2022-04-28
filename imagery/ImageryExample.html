@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>ImageryExample</title>
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/cesium@1.92.0/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      padding: 5px 10px;
+      width: 260px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      color: #fff;
+      background-color: rgba(40, 44, 50, 0.9);
+      border-radius: 10px;
+    }
+
+    .el-select {
+      width: 260px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer">
+    <div id="app">
+      <div>提示：点击下拉菜单选择影像</div><br>
+      <el-select v-model="value" placeholder="请选择" size="small" @change="selectChange">
+        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+    </div>
+  </div>
+  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
+  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cesium@1.92.0/Build/Cesium/Cesium.js"></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      })
+    })
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          options: [{
+            value: 'ArcGis',
+            label: 'ArcGisMapServerImageryProvider'
+          }, {
+            value: 'BingMaps',
+            label: 'BingMapsImageryProvider'
+          }, {
+            value: 'Grid',
+            label: 'GridImageryProvider'
+          }, {
+            value: 'OpenStreetMap',
+            label: 'OpenStreetMapImageryProvider'
+          }, {
+            value: 'SingleTile',
+            label: 'SingleTileImageryProvider'
+          }, {
+            value: 'TileCoordinates',
+            label: 'TileCoordinatesImageryProvider'
+          }, {
+            value: 'UrlTemplate',
+            label: 'UrlTemplateImageryProvider - 高德'
+          }, {
+            value: 'WebMapTile',
+            label: 'WebMapTileServiceImageryProvider - 天地图'
+          }],
+          value: 'ArcGis'
+        }
+      },
+      methods: {
+        changeImagery(typeObj) {
+          viewer.imageryLayers.addImageryProvider(typeObj)
+        },
+        selectChange(item) {
+          viewer.imageryLayers.removeAll(true)
+          console.log(item)
+          switch (item) {
+            case 'ArcGis':
+              this.changeImagery(new Cesium.ArcGisMapServerImageryProvider({
+                url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+              }))
+              break
+            case 'BingMaps':
+              this.changeImagery(new Cesium.BingMapsImageryProvider({
+                url: 'https://dev.virtualearth.net',
+                key: 'AgcbDCAOb9zMfquaT4Z-MdHX4AsHUNvs7xgdHefEA5myMHxZk87NTNgdLbG90IE-',
+                mapStyle: Cesium.BingMapsStyle.AERIAL
+              }))
+              break
+            case 'Grid':
+              this.changeImagery(new Cesium.GridImageryProvider())
+              break
+            case 'OpenStreetMap':
+              this.changeImagery(new Cesium.OpenStreetMapImageryProvider({
+                url: 'https://a.tile.openstreetmap.org/'
+              }))
+              break
+            case 'SingleTile':
+              this.changeImagery(new Cesium.SingleTileImageryProvider({
+                url: './worldimage.jpg'
+              }))
+              break
+            case 'TileCoordinates':
+              this.changeImagery(new Cesium.TileCoordinatesImageryProvider())
+              break
+            case 'UrlTemplate':
+              this.changeImagery(new Cesium.UrlTemplateImageryProvider({
+                url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+              }))
+              break
+            case 'WebMapTile':
+              this.changeImagery(new Cesium.WebMapTileServiceImageryProvider({
+                url: 'http://t0.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=2ec220dbc0d7c39975ea06c3a7ff627a',
+                layer: "tdtBasicLayer",
+                style: "default",
+                format: "image/jpeg",
+                tileMatrixSetID: "GoogleMapsCompatible",
+              }))
+              break
+          }
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>
