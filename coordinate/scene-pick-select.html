@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>scene-pick-select</title>
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
+  <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      padding: 20px;
+      width: 225px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      color: #fff;
+      background-color: rgba(40, 44, 50, 0.9);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer">
+    <div id="app">
+      <div>提示：点击3D tiles将其颜色修改为红色</div>
+    </div>
+  </div>
+  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
+  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Cesium.js"></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      // imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+      //   url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      // })
+    })
+    const tileset = viewer.scene.primitives.add(
+      new Cesium.Cesium3DTileset({
+        url: '../3dtiles/tilesset/tileset.json',
+      })
+    );
+    viewer.zoomTo(tileset)
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      mounted() {
+        // 高亮元素
+        const hightLighted = {
+          feautre: undefined,
+          originalColor: new Cesium.Color(),
+        }
+        viewer.screenSpaceEventHandler.setInputAction(function (movement) {
+          // 清除之前的高亮元素
+          if (Cesium.defined(hightLighted.feature)) {
+            hightLighted.feature.color = hightLighted.originalColor;
+            hightLighted.feature = undefined;
+          }
+          // 选择新要素
+          const pickedFeature = viewer.scene.pick(movement.position);
+          if (!Cesium.defined(pickedFeature)) {
+            return
+          }
+          // 存储选中要素的信息
+          hightLighted.feature = pickedFeature
+          Cesium.Color.clone(
+            pickedFeature.color,
+            hightLighted.originalColor
+          )
+          // 高亮选中元素
+          pickedFeature.color = Cesium.Color.RED
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
+      },
+    })
+  </script>
+</body>
+
+</html>
