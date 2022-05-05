@@ -1,18 +1,10 @@
-<!--
- * @Author: your name
- * @Date: 2022-05-03 12:29:33
- * @LastEditTime: 2022-05-04 12:47:37
- * @LastEditors: your name
- * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- * @FilePath: \cesium-docs-demo\coordinate\scene-drillPick.html
--->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>scene-pick</title>
+  <title>scene-pickPosition</title>
   <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
   <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css'>
   <style>
@@ -28,7 +20,7 @@
 
     #app {
       padding: 20px;
-      width: 400px;
+      width: 220px;
       position: absolute;
       left: 10px;
       top: 10px;
@@ -43,8 +35,10 @@
 <body>
   <div id="cesiumContainer">
     <div id="app">
-      <div>提示：点击3D tiles将显示拾取到 Cesium3DTileFeature 对象的个数</div><br/>
-      <div>拾取到的 Cesium3DTileFeature 对象个数：{{featureCount}}</div>
+      <div>提示：鼠标左键点击地球拾取 Cartesian3 对象</div><br />
+      <div>X：{{pos.x}}</div>
+      <div>Y：{{pos.y}}</div>
+      <div>Z：{{pos.z}}</div>
     </div>
   </div>
   <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
@@ -57,26 +51,19 @@
       //   url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
       // })
     })
-    const tileset = viewer.scene.primitives.add(
-      new Cesium.Cesium3DTileset({
-        url: '../3dtiles/tilesset/tileset.json',
-      })
-    );
-    viewer.zoomTo(tileset)
   </script>
   <script>
     new Vue({
       el: '#app',
       data() {
         return {
-          featureCount: 0
+          pos: {}
         }
       },
       mounted() {
         const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
         handler.setInputAction((movement) => {
-          const featureArray = viewer.scene.drillPick(movement.position)
-          this.featureCount = featureArray.length
+          this.pos = viewer.scene.pickPosition(movement.position)
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
       },
     })
