@@ -72,11 +72,11 @@
           this.position = position.position
         }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK)
         handler.setInputAction((position) => {
-          console.log(position)
+          this.type = '鼠标右键单击 RIGHT_CLICK'
           this.position = position.position
         }, Cesium.ScreenSpaceEventType.RIGHT_CLICK)
         handler.setInputAction((position) => {
-          console.log(position)
+          this.type = '鼠标中键单击 MIDDLE_CLICK'
           this.position = position.position
         }, Cesium.ScreenSpaceEventType.MIDDLE_CLICK)
       },
