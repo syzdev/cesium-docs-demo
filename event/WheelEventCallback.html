@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>MotionEventCallback</title>
+  <title>WheelEventCallback</title>
   <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
   <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css'>
   <style>
@@ -20,7 +20,7 @@
 
     #app {
       padding: 20px;
-      width: 250px;
+      width: 300px;
       position: absolute;
       left: 10px;
       top: 10px;
@@ -35,14 +35,8 @@
 <body>
   <div id="cesiumContainer">
     <div id="app">
-      <div>提示：鼠标移动显示startPosition和endPosition</div><br />
-      <div>startPosition 鼠标移动起始点</div>
-      <div>startPosition.x：{{startPosition.x}}</div>
-      <div>startPosition.y：{{startPosition.y}}</div>
-      <br />
-      <div>endPosition 鼠标移动终点</div>
-      <div>endPosition.x：{{endPosition.x}}</div>
-      <div>endPosition.y：{{endPosition.y}}</div>
+      <div>提示：鼠标移动显示鼠标滚轮滚动值delta</div><br />
+      <div>鼠标滚轮滚动值delta：{{delta}}</div>
     </div>
   </div>
   <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
@@ -62,18 +56,15 @@
       data() {
         return {
           // type: '',
-          startPosition: {},
-          endPosition: {}
+          delta: 0
         }
       },
       mounted() {
         const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
-        handler.setInputAction((positions) => {
-          // console.log(positions)
-          // positions中包含startPosition和endPosition两个Cartesian2对象
-          this.startPosition = positions.startPosition
-          this.endPosition = positions.endPosition
-        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
+        handler.setInputAction((delta) => {
+          this.delta = delta
+          // delta为鼠标滚轮滚动的值
+        }, Cesium.ScreenSpaceEventType.WHEEL)
       },
     })
   </script>
