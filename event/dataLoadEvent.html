@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>dataLoadEvent</title>
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
+  <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      padding: 20px;
+      width: 220px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      color: #fff;
+      background-color: rgba(40, 44, 50, 0.9);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer">
+    <div id="app">
+      <div>提示：本例将监听以下事件</div><br />
+      <div>allTilesLoaded</div>
+      <div>initialTilesLoaded</div>
+      <div>loadProgress</div>
+      <div>tileLoad</div><br />
+      <div>注：场景中的线框为3D tiles的瓦片包围盒</div>
+    </div>
+  </div>
+  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
+  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Cesium.js"></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      // imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+      //   url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      // })
+    })
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          changedInfo: '',
+          info: ''
+        }
+      },
+      mounted() {
+        // 加载3D tiles
+        const tileset = viewer.scene.primitives.add(
+          new Cesium.Cesium3DTileset({
+            url: '../3dtiles/tilesset/tileset.json',
+          })
+        )
+        // 视角定位到3D tiles
+        viewer.zoomTo(tileset)
+        // allTilesLoaded 瓦片集加载完成
+        tileset.allTilesLoaded.addEventListener(() => {
+          console.log('allTilesLoaded，瓦片集加载完成')
+        })
+        // initialTilesLoaded 瓦片集加载完成，并且场景初始化完成
+        tileset.initialTilesLoaded.addEventListener(() => {
+          console.log('initialTilesLoaded，瓦片集加载完成，并且场景初始化完成')
+        })
+        // loadProgress 瓦片加载进度
+        tileset.loadProgress.addEventListener((numberOfPendingRequests, numberOfTilesProcessing) => {
+          if ((numberOfPendingRequests === 0) && (numberOfTilesProcessing === 0)) {
+            console.log('loadProgress，加载完成')
+            return
+          }
+          console.log('loadProgress，请求挂起的瓦片数量' + numberOfPendingRequests + ', 正在处理的瓦片数量: ' + numberOfTilesProcessing);
+        })
+        // tileLoad 一个瓦片被加载
+        tileset.tileLoad.addEventListener(tile => {
+          console.log('tileLoad，一个瓦片被加载了', tile)
+        })
+        // 显示3D tiles的瓦片包围盒
+        tileset.debugShowContentBoundingVolume = true
+      },
+    })
+  </script>
+</body>
+
+</html>
