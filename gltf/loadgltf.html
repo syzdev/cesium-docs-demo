@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>loadgltf</title>
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
+  <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      padding: 20px;
+      width: 220px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      color: #fff;
+      background-color: rgba(40, 44, 50, 0.9);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer">
+    <div id="app">
+      <div>提示：点击选择显示的模型</div><br />
+      <el-select v-model="value" placeholder="请选择" size="mini" @change="changeModel">
+        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+    </div>
+  </div>
+  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
+  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Cesium.js"></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      shouldAnimate: true, // 开启动画
+      // imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+      //   url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      // })
+    })
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          options: [{
+            value: 'Cesium_Man',
+            label: 'Cesium 人体模型'
+          }, {
+            value: 'CesiumBalloon',
+            label: 'Cesium 热气球'
+          }, {
+            value: 'CesiumDrone',
+            label: 'Cesium 无人机'
+          }],
+          value: 'CesiumDrone'
+        }
+      },
+      mounted() {
+        this.createModel('./CesiumDrone.glb', 150)
+      },
+      methods: {
+        createModel(modelURL, height) {
+          viewer.entities.removeAll()
+
+          const position = Cesium.Cartesian3.fromDegrees(
+            -123.0744619,
+            44.0503706,
+            height
+          )
+
+          const heading = Cesium.Math.toRadians(135)
+          const pitch = 0
+          const roll = 0
+          const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll)
+          const orientation = Cesium.Transforms.headingPitchRollQuaternion(
+            position,
+            hpr
+          )
+
+          const entity = viewer.entities.add({
+            name: modelURL,
+            position: position,
+            orientation: orientation,
+            model: {
+              uri: modelURL,
+              minimumPixelSize: 128,
+              maximumScale: 20000,
+            },
+          })
+          viewer.trackedEntity = entity // 将视角锁定到entity
+        },
+
+        changeModel(value) {
+          if (value === 'Cesium_Man') {
+            this.createModel('./Cesium_Man.glb', 0)
+          } else if (value === 'CesiumBalloon') {
+            this.createModel('./CesiumBalloon.glb', 1000)
+          } else if (value === 'CesiumDrone') {
+            this.createModel('./CesiumDrone.glb', 150)
+          }
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>
