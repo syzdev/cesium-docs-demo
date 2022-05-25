@@ -25,19 +25,19 @@
   <script>
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
     var viewer = new Cesium.Viewer("cesiumContainer", {
-      animation: false, //是否显示动画控件
-      baseLayerPicker: true, //是否显示图层选择控件
-      geocoder: true, //是否显示地名查找控件
-      timeline: false, //是否显示时间线控件
-      sceneModePicker: true, //是否显示投影方式控件
-      navigationHelpButton: true, //是否显示帮助信息控件
-      infoBox: true, //是否显示点击要素之后显示的信息
+      // animation: false, //是否显示动画控件
+      // baseLayerPicker: true, //是否显示图层选择控件
+      // geocoder: true, //是否显示地名查找控件
+      // timeline: false, //是否显示时间线控件
+      // sceneModePicker: true, //是否显示投影方式控件
+      // navigationHelpButton: true, //是否显示帮助信息控件
+      // infoBox: true, //是否显示点击要素之后显示的信息
     });
     const tileset = viewer.scene.primitives.add(
       new Cesium.Cesium3DTileset({
         url: './3dtiles/tilesset/tileset.json',
       })
-    );
+    )
     viewer.zoomTo(tileset)
   </script>
 </body>
