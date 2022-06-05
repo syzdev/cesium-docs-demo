@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>sceneOperation</title>
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.7/theme-chalk/index.min.css">
+  <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      padding: 20px;
+      width: 140px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      color: #fff;
+      background-color: rgba(40, 44, 50, 0.9);
+      border-radius: 10px;
+    }
+
+    .item {
+      margin: 5px 0;
+    }
+
+    .el-checkbox__label {
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer">
+    <div id="app">
+      <div>提示：点击下方 checkbox 显示或隐藏场景要素</div><br>
+      <div class="item">
+        <el-checkbox v-model="debugShowFramesPerSecond">帧率</el-checkbox>
+      </div>
+      <div class="item">
+        <el-checkbox v-model="skyBox">星空</el-checkbox>
+      </div>
+      <div class="item">
+        <el-checkbox v-model="skyAtmosphere">大气层</el-checkbox>
+      </div>
+      <div class="item">
+        <el-checkbox v-model="globe">地球</el-checkbox>
+      </div>
+      <div class="item">
+        <el-checkbox v-model="sun">太阳</el-checkbox>
+      </div>
+      <div class="item">
+        <el-checkbox v-model="moon">月亮</el-checkbox>
+      </div>
+    </div>
+  </div>
+  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
+  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Cesium.js"></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      // imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+      //   url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+      // }),
+      baseLayerPicker: false, // 是否显示图层选择控件
+    })
+    viewer.scene.debugShowFramesPerSecond = true // 显示帧率
+  </script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: function () {
+        return {
+          debugShowFramesPerSecond: true,
+          skyBox: true,
+          skyAtmosphere: true,
+          globe: true,
+          sun: true,
+          moon: true,
+        }
+      },
+      watch: {
+        debugShowFramesPerSecond(value) {
+          viewer.scene.debugShowFramesPerSecond = value // 显示帧率
+        },
+        skyBox(value) {
+          viewer.scene.skyBox.show = value // 隐藏星空
+        },
+        skyAtmosphere(value) {
+          viewer.scene.skyAtmosphere.show = value  // 隐藏大气层
+        },
+        globe(value) {
+          viewer.scene.globe.show = value  // 隐藏地球
+        },
+        sun(value) {
+          viewer.scene.sun.show = value  // 隐藏太阳
+        },
+        moon(value) {
+          viewer.scene.moon.show = value // 隐藏月亮
+        },
+      },
+    })
+  </script>
+</body>
+
+</html>
