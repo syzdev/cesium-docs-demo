@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>CustomHeightmapTerrainProvider</title>
+  <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <script src='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Cesium.js'></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer")
+    let width = 64
+    let height = 64
+    viewer.terrainProvider = new Cesium.CustomHeightmapTerrainProvider({
+      callback: (x, y, level) => {
+        let buffer = new Float32Array(width * height)
+        for (let yy = 0; yy < height; yy++) {
+          for (let xx = 0; xx < width; xx++) {
+            let v = (y + yy / (height - 1)) / Math.pow(2, level)
+            let heightValue = 8000 * (Math.sin(4000 * v) * 0.5 + 0.5)
+            let index = yy * width + xx
+            buffer[index] = heightValue
+          }
+        }
+        return buffer
+      },
+      width: width,
+      height: height,
+    })
+    viewer.camera.setView({
+      destination: Cesium.Cartesian3.fromDegrees(82.9098, 29.2106, 35000.0), // 设置位置，北京的坐标
+      orientation: {
+        heading: Cesium.Math.toRadians(20.0),
+        pitch: Cesium.Math.toRadians(-40.0),
+        roll: 0
+      }
+    })
+  </script>
+</body>
+
+</html>
