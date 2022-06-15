@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>terrainElevation</title>
+  <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css'>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <script src='https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Cesium.js'></script>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
+    const viewer = new Cesium.Viewer("cesiumContainer")
+    viewer.terrainProvider = new Cesium.ArcGISTiledElevationTerrainProvider({
+      url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+    })
+
+    viewer.camera.setView({
+      destination: Cesium.Cartesian3.fromDegrees(82.9098, 29.2106, 15000.0), // 设置位置，北京的坐标
+      orientation: {
+        heading: Cesium.Math.toRadians(20.0),
+        pitch: Cesium.Math.toRadians(-40.0),
+        roll: 0
+      }
+    })
+
+
+    contourLine(2.0, 100, Cesium.Color.RED)
+
+    /**
+     * @description: 
+     * @param {*} width 等高线的线宽，单位px
+     * @param {*} spacing 等高线的高度间隔，单位m
+     * @param {*} color 等高线的颜色，Cesium.Color
+     * @return {*}
+     */
+    function contourLine(width, spacing, color) {
+      let material = Cesium.Material.fromType("ElevationContour")
+      material.uniforms.width = width
+      material.uniforms.spacing = spacing
+      material.uniforms.color = color
+      viewer.scene.globe.material = material
+    }
+  </script>
+</body>
+
+</html>
