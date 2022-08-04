@@ -87,8 +87,8 @@
       // three.scene.add(new THREE.AxesHelper(20)) // 添加场景坐标轴
 
       // 3 初始化Three渲染器
-      // three.renderer = new THREE.WebGLRenderer({ antialias: true }) // 初始化Three渲染器
-      three.renderer = new THREE.WebGLRenderer() // 初始化Three渲染器
+      three.renderer = new THREE.WebGLRenderer({ antialias: true }) // 初始化Three渲染器
+      // three.renderer = new THREE.WebGLRenderer() // 初始化Three渲染器
       three.renderer.setClearColor(0xffffff, 1.0) // 设置渲染背景色
       three.renderer.shadowMap.enabled = true // 开启场景光照阴影效果
       three.renderer.setSize(window.innerWidth, window.innerHeight) // 设置渲染范围大小
