@@ -10,6 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.2/build/cannon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dat.gui@0.7.9/build/dat.gui.min.js"></script>
+  <script src="../utils/createButton.js"></script>
   <style>
     html,
     body,
@@ -26,6 +27,7 @@
 <body>
   <div id="threeContainer"></div>
   <script>
+    createButton('https://github.com/syzdev/cesium-docs-demo')
     /**
      * MeshBodyToUpdate为一个对象数组
      * 数组中的每一个对象为Three中的Mesh和Cannon中的Body
