@@ -5,10 +5,11 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cannon</title>
+  <title>Cannon - debug</title>
   <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.2/build/cannon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.2/tools/threejs/CannonDebugRenderer.js"></script>
   <style>
     html,
     body,
@@ -81,7 +82,7 @@
         0.1,
         1000
       )
-      three.camera.position.set(20, 20, 20) // 设置相机位置
+      three.camera.position.set(10, 10, 10) // 设置相机位置
       three.camera.lookAt(three.scene.position) // 设置相机视角朝向Three场景scene
 
       // three.scene.add(new THREE.AxesHelper(20)) // 添加场景坐标轴
@@ -178,7 +179,7 @@
 
       // 2 创建Three中的地板网格
       // 2.0 创建Three中的地板网格形状
-      let threePlaneGeometry = new THREE.PlaneGeometry(20, 20, 20)
+      let threePlaneGeometry = new THREE.PlaneGeometry(10, 10, 10)
       // 2.1 创建地板网格的材质
       let threePlaneMaterial = new THREE.MeshLambertMaterial({
         color: 0xa5a5a5,
@@ -196,7 +197,7 @@
       // 2.5 设置地板网格的位置，坐标原点
       threePlaneMesh.position.set(0, 0, 0)
       // 2.6 设置地板网格的大小缩放
-      threePlaneMesh.scale.set(2, 2, 2)
+      // threePlaneMesh.scale.set(2, 2, 2)
       // 2.7 将threePlaneMesh添加到Three场景scene中
       three.scene.add(threePlaneMesh)
     }
@@ -228,7 +229,7 @@
 
       // 2 创建Three中的球体网格
       // 2.1 创建球体网格的形状
-      let threeSphereGeometry = new THREE.SphereGeometry(1, 32, 32)
+      let threeSphereGeometry = new THREE.SphereGeometry(1, 16, 16)
       // 2.2 创建球体网格的材质
       let threeSphereMaterial = new THREE.MeshStandardMaterial({
         color: 0xFFB6C1,
@@ -267,6 +268,7 @@
       }
 
       requestAnimationFrame(render)
+      cannonDebugger.update()
       three.renderer.render(three.scene, three.camera)
     }
 
@@ -274,6 +276,9 @@
     initCannon()
     createPlane()
     createSphere()
+
+    const cannonDebugger = new THREE.CannonDebugRenderer(three.scene, cannon.world)
+
     render()
 
     // 改变窗口大小重新渲染场景
