@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Cannon-Cesium</title>
+  <!-- Cesium 1.95 -->
+  <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Widgets/widgets.css">
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Cesium.js"></script>
+  <!-- Three.js 143 -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dat.gui@0.7.9/build/dat.gui.min.js"></script>
+  <!-- Cannon.js -->
+  <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.2/build/cannon.min.js"></script>
+  <script src="../utils/createButton.js"></script>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .cesium-viewer .cesium-widget-credits {
+      display: none;
+    }
+
+    #ThreeContainer canvas {
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <div id="ThreeContainer"></div>
+  <script>
+    createButton('https://github.com/syzdev/cesium-docs-demo')
+    
+    let three = {
+      renderer: null,
+      camera: null,
+      scene: null,
+    }
+
+    let cesium = {
+      viewer: null,
+    }
+
+    let cannon = {
+      world: null,
+    }
+    const cannonDefaultMaterial = new CANNON.Material()
+    let cannonDefaultCantactMaterial = null // 关联材质
+    let cannonSphereBody = null // 小球
+    let threeSphereMaterial = null // 小球材质
+    let friction = 0.5
+    let restitution = 0.7
+    const MeshBodyToUpdate = []
+
+    let minWGS84 = [115.23, 39.55];
+    let maxWGS84 = [116.23, 41.55];
+
+    let cesiumContainer = document.getElementById('cesiumContainer')
+    let ThreeContainer = document.getElementById('ThreeContainer')
+    let _3Dobjects = [] // Could be any Three.js object mesh
+
+    function _3DObject() {
+      this.threeMesh = null // Three.js 3DObject.mesh
+      this.minWGS84 = null // location bounding box
+      this.maxWGS84 = null
+    }
+
+    function initCannon() {
+      cannon.world = new CANNON.World()
+      cannon.world.gravity.set(0, -90000.8, 0)
+      cannon.world.broadphase = new CANNON.NaiveBroadphase()
+      cannonDefaultCantactMaterial = new CANNON.ContactMaterial(
+        cannonDefaultMaterial,
+        cannonDefaultMaterial,
+        {
+          friction,
+          restitution,
+        }
+      )
+      cannon.world.addContactMaterial(cannonDefaultCantactMaterial)
+    }
+
+    function addPlane() {
+      // 添加CannonPlane地板
+      let cannonGroundShape = new CANNON.Plane()
+      let cannonGroundBody = new CANNON.Body({
+        mass: 0,
+        position: new CANNON.Vec3(0, 6371000, 0),
+        shape: cannonGroundShape,
+        material: cannonDefaultMaterial,
+      })
+      cannonGroundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
+      cannon.world.add(cannonGroundBody)
+      // 添加ThreePlaneGeometry地板
+      let threeGroundGeometry = new THREE.PlaneGeometry(20, 20, 32)
+      let threeGroundMaterial = new THREE.MeshLambertMaterial({
+        color: 0xf5f5f5,
+        side: THREE.DoubleSide,
+      })
+      let threeGroundMesh = new THREE.Mesh(threeGroundGeometry, threeGroundMaterial)
+      threeGroundMesh.rotation.x = -Math.PI / 2
+      threeGroundMesh.position.set(0, 6371000, 0)
+      threeGroundMesh.receiveShadow = true
+      threeGroundMesh.scale.set(2500, 2500, 2500)
+      three.scene.add(threeGroundMesh)
+    }
+
+    function addShpere() {
+      // 添加CannonSphere小球
+      let cannonSphereShape = new CANNON.Sphere(1000)
+      cannonSphereBody = new CANNON.Body({
+        mass: 5,
+        shape: cannonSphereShape,
+        position: new CANNON.Vec3(0, 6420000, 0),
+        material: cannonDefaultMaterial,
+      })
+      cannon.world.add(cannonSphereBody)
+      // 添加ThreeSphereGeometry小球
+      let threeSphereGeometry = new THREE.SphereGeometry(1, 32, 32)
+      threeSphereMaterial = new THREE.MeshStandardMaterial({ color: 0xFFB6C1 })
+      let threeSphereMesh = new THREE.Mesh(threeSphereGeometry, threeSphereMaterial)
+      threeSphereMesh.castShadow = true
+      threeSphereMesh.scale.set(1000, 1000, 1000)
+      three.scene.add(threeSphereMesh)
+      // 添加到MeshBodyToUpdate
+      MeshBodyToUpdate.push({
+        body: cannonSphereBody,
+        mesh: threeSphereMesh,
+      })
+    }
+
+    function initCesium() {
+      cesium.viewer = new Cesium.Viewer(cesiumContainer, {
+        useDefaultRenderLoop: false,
+        selectionIndicator: false,
+        homeButton: false,
+        sceneModePicker: false,
+        infoBox: false,
+        navigationHelpButton: false,
+        navigationInstructionsInitiallyVisible: false,
+        animation: false,
+        timeline: false,
+        fullscreenButton: false,
+        allowTextureFilterAnisotropic: false,
+        baseLayerPicker: false,
+
+        // contextOptions: {
+        //   webgl: {
+        //     alpha: false,
+        //     antialias: true,
+        //     preserveDrawingBuffer: true,
+        //     failIfMajorPerformanceCaveat: false,
+        //     depth: true,
+        //     stencil: false,
+        //     anialias: false,
+        //   },
+        // },
+
+        targetFrameRate: 60,
+        // resolutionScale: 0.1,
+        orderIndependentTranslucency: true,
+        geocoder: false,
+        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+        }),
+        automaticallyTrackDataSourceClocks: false,
+        // creditContainer : "hidecredit", // Cannot read properties of null (reading 'appendChild')
+        dataSources: null,
+        clock: null,
+        terrainShadows: Cesium.ShadowMode.DISABLED,
+      })
+      cesium.viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(
+          90.015299, 0.000161, 150000
+        ),
+      })
+    }
+
+    function initDatGui() {
+      let gui = new dat.GUI()
+
+      let controls = {
+        resetBall: () => {
+          cannonSphereBody.position.set(0, 6420000, 0) // 重置小球位置
+          cannonSphereBody.velocity.set(0, 0, 0) // 重置小球速度
+          cannonDefaultCantactMaterial.friction = friction // 修改摩擦力
+          cannonDefaultCantactMaterial.restitution = restitution // 修改弹性系数
+        },
+        friction,
+        restitution,
+        color: threeSphereMaterial.color.getStyle()
+      }
+
+      gui.add(controls, 'resetBall').name('重置小球下落')
+      gui.add(controls, 'friction', 0, 2).name('摩擦力').onChange((e) => {
+        friction = e
+      })
+      gui.add(controls, 'restitution', 0, 2).name('弹性系数').onChange((e) => {
+        restitution = e
+      })
+      gui.addColor(controls, 'color').name('小球颜色').onChange((e) => {
+        threeSphereMaterial.color.setStyle(e)
+      })
+    }
+
+    function initThree() {
+      let fov = 45
+      let width = window.innerWidth
+      let height = window.innerHeight
+      let aspect = width / height
+      let near = 50
+      let far = 10 * 1000 * 10000
+      three.scene = new THREE.Scene()
+      three.camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+      three.renderer = new THREE.WebGLRenderer({ alpha: true })
+      three.renderer.shadowMap.enabled = true
+      ThreeContainer.appendChild(three.renderer.domElement)
+      // 创建环境光
+      let Amlight = new THREE.AmbientLight(0x444444, 1)
+      three.scene.add(Amlight)
+      // 创建点光源
+      let spotLight = new THREE.SpotLight(0x999999, 1)
+      spotLight.position.set(0, 6441000, -20000)
+      spotLight.castShadow = true
+      spotLight.shadow.camera.near = 1
+      spotLight.shadow.camera.far = 30000000
+      spotLight.shadow.camera.fov = 90
+      three.scene.add(spotLight)
+      let spotLightHelper = new THREE.SpotLightHelper(spotLight)
+      three.scene.add(spotLightHelper)
+    }
+
+    function renderCesium() {
+      cesium.viewer.render()
+    }
+
+    function renderThreeObj() {
+      // register Three.js scene with Cesium
+      three.camera.fov = Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy) // ThreeJS FOV is vertical
+      // three.camera.updateProjectionMatrix();
+      let cartToVec = function (cart) {
+        return new THREE.Vector3(cart.x, cart.y, cart.z)
+      }
+
+      // Configure Three.js meshes to stand against globe center position up direction
+      for (let id in _3Dobjects) {
+        minWGS84 = _3Dobjects[id].minWGS84
+        maxWGS84 = _3Dobjects[id].maxWGS84
+        // convert lat/long center position to Cartesian3
+        let center = Cesium.Cartesian3.fromDegrees(
+          (minWGS84[0] + maxWGS84[0]) / 2,
+          (minWGS84[1] + maxWGS84[1]) / 2
+        )
+        // get forward direction for orienting model
+        let centerHigh = Cesium.Cartesian3.fromDegrees(
+          (minWGS84[0] + maxWGS84[0]) / 2,
+          (minWGS84[1] + maxWGS84[1]) / 2,
+          1
+        )
+        // use direction from bottom left to top left as up-vector
+        let bottomLeft = cartToVec(
+          Cesium.Cartesian3.fromDegrees(minWGS84[0], minWGS84[1])
+        )
+        let topLeft = cartToVec(
+          Cesium.Cartesian3.fromDegrees(minWGS84[0], maxWGS84[1])
+        )
+        let latDir = new THREE.Vector3().subVectors(bottomLeft, topLeft).normalize()
+        // configure entity position and orientation
+        _3Dobjects[id].threeMesh.position.copy(center)
+        _3Dobjects[id].threeMesh.lookAt(centerHigh.x, centerHigh.y, centerHigh.z)
+        _3Dobjects[id].threeMesh.up.copy(latDir)
+      }
+      // Clone Cesium Camera projection position so the
+      // Three.js Object will appear to be at the same place as above the Cesium Globe
+      three.camera.matrixAutoUpdate = false
+      let cvm = cesium.viewer.camera.viewMatrix
+      let civm = cesium.viewer.camera.inverseViewMatrix
+
+      three.camera.lookAt(0, 0, 0)
+
+      three.camera.matrixWorld.set(
+        civm[0],
+        civm[4],
+        civm[8],
+        civm[12],
+        civm[1],
+        civm[5],
+        civm[9],
+        civm[13],
+        civm[2],
+        civm[6],
+        civm[10],
+        civm[14],
+        civm[3],
+        civm[7],
+        civm[11],
+        civm[15]
+      )
+
+      three.camera.matrixWorldInverse.set(
+        cvm[0],
+        cvm[4],
+        cvm[8],
+        cvm[12],
+        cvm[1],
+        cvm[5],
+        cvm[9],
+        cvm[13],
+        cvm[2],
+        cvm[6],
+        cvm[10],
+        cvm[14],
+        cvm[3],
+        cvm[7],
+        cvm[11],
+        cvm[15]
+      )
+
+      let width = cesiumContainer.clientWidth
+      let height = cesiumContainer.clientHeight
+
+      let aspect = width / height
+      three.camera.aspect = aspect
+      three.camera.updateProjectionMatrix()
+      three.renderer.setSize(width, height)
+      three.renderer.clear()
+      three.renderer.render(three.scene, three.camera)
+    }
+
+    function loop() {
+      cannon.world.step(1.0 / 60.0)
+
+      // 更新MeshBodyToUpdate中的Mesh和Body，使其位置和旋转同步
+      for (const object of MeshBodyToUpdate) {
+        object.mesh.position.copy(object.body.position)
+        object.mesh.quaternion.copy(object.body.quaternion)
+      }
+
+      requestAnimationFrame(loop)
+      renderCesium()
+      renderThreeObj()
+    }
+
+    initCesium() // Initialize Cesium renderer
+    initThree() // Initialize Three.js renderer
+    initCannon()
+    addShpere()
+    addPlane()
+    initDatGui()
+    loop() // Looping renderer
+
+  </script>
+</body>

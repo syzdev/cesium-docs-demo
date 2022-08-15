@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cannon - datgui</title>
+  <title>Cannon-datgui</title>
   <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.2/build/cannon.min.js"></script>
@@ -75,6 +75,7 @@
      * @description: 初始化dat.gui
      */
     const initDatGui = () => {
+      // TODO：将friction和restitution设为全局变量
       let gui = new dat.GUI()
 
       let controls = {
