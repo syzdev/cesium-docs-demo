@@ -63,6 +63,9 @@
       world: null,
     }
 
+    let friction = 0.5
+    let restitution = 0.7
+
     /**
      * dat.gui控制的变量
      */
@@ -75,7 +78,6 @@
      * @description: 初始化dat.gui
      */
     const initDatGui = () => {
-      // TODO：将friction和restitution设为全局变量
       let gui = new dat.GUI()
 
       let controls = {
@@ -85,8 +87,8 @@
           cannonDefaultCantactMaterial.friction = friction // 修改摩擦力
           cannonDefaultCantactMaterial.restitution = restitution // 修改弹性系数
         },
-        friction: 0.5,
-        restitution: 0.7,
+        friction,
+        restitution,
         color: threeSphereMaterial.color.getStyle()
       }
 
@@ -178,8 +180,8 @@
         cannonDefaultMaterial,
         cannonDefaultMaterial,
         {
-          friction: 0.5,
-          restitution: 0.7,
+          friction,
+          restitution,
         }
       )
       // 4.5 将两个默认材质添加到物理世界world中
