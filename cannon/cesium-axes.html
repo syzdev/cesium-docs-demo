@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-  <title>Cannon-Cesium</title>
+  <title>Cannon-Cesium-axes</title>
   <!-- Cesium 1.95 -->
   <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Widgets/widgets.css">
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Cesium.js"></script>
@@ -183,7 +183,6 @@
         clock: null,
         terrainShadows: Cesium.ShadowMode.DISABLED,
       })
-      // TODO：修改为setView
       cesium.viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(
           90.015299, 0.000161, 150000
@@ -243,6 +242,11 @@
       three.scene.add(spotLight)
       let spotLightHelper = new THREE.SpotLightHelper(spotLight)
       three.scene.add(spotLightHelper)
+
+      // 红色代表 X 轴. 绿色代表 Y 轴. 蓝色代表 Z 轴.
+      const axesHelper = new THREE.AxesHelper(64410000)
+      three.scene.add(axesHelper)
+
     }
 
     function renderCesium() {
