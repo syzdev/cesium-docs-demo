@@ -183,8 +183,7 @@
         clock: null,
         terrainShadows: Cesium.ShadowMode.DISABLED,
       })
-      // TODO：修改为setView
-      cesium.viewer.camera.flyTo({
+      cesium.viewer.camera.setView({
         destination: Cesium.Cartesian3.fromDegrees(
           90.015299, 0.000161, 150000
         ),
