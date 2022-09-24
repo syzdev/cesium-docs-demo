@@ -32,6 +32,9 @@
       // sceneModePicker: true, //是否显示投影方式控件
       // navigationHelpButton: true, //是否显示帮助信息控件
       // infoBox: true, //是否显示点击要素之后显示的信息
+      imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      })
     });
 
     let tileset = viewer.scene.primitives.add(

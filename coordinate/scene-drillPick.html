@@ -43,9 +43,9 @@
   <script>
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
     const viewer = new Cesium.Viewer("cesiumContainer", {
-      // imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-      //   url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
-      // })
+      imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      })
     })
     const tileset = viewer.scene.primitives.add(
       new Cesium.Cesium3DTileset({
