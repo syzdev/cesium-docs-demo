@@ -5,7 +5,6 @@
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <title>controlOperation</title>
-  <link rel="stylesheet" href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/element-ui/2.15.7/theme-chalk/index.min.css">
   <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.97/Build/Cesium/Widgets/widgets.css'>
   <style>
     html,
@@ -18,64 +17,39 @@
       overflow: hidden;
     }
 
-    #app {
-      padding: 20px;
-      width: 200px;
+    .tips {
       position: absolute;
-      left: 10px;
       top: 10px;
+      left: 10px;
+      font-size: 14px;
       z-index: 999;
-      color: #fff;
-      background-color: rgba(40, 44, 50, 0.9);
-      border-radius: 10px;
+      color: #ebebeb;
+      background-color: #1f1f1f;
+      border-radius: 2px;
+      padding: 4px;
+      user-select: none;
     }
 
-    .item {
-      margin: 5px 0;
+    .lil-gui {
+      --width: 180px;
+      --name-width: 85%;
     }
 
-    .el-checkbox__label {
-      color: #fff;
+    .lil-gui.autoPlace {
+      top: 50px;
+      left: 10px;
     }
   </style>
 </head>
 
 <body>
   <div id="cesiumContainer">
-    <div id="app">
-      <div>提示：点击下方 checkbox 显示或隐藏视图控件</div><br>
-      <div class="item">
-        <el-checkbox v-model="geocoder">geocoder</el-checkbox>
-      </div>
-      <div class="item">
-        <el-checkbox v-model="homeButton">homeButton</el-checkbox>
-      </div>
-      <div class="item">
-        <el-checkbox v-model="sceneModePicker">sceneModePicker</el-checkbox>
-      </div>
-      <!-- <div class="item">
-        <el-checkbox v-model="baseLayerPicker">baseLayerPicker</el-checkbox>
-      </div> -->
-      <div class="item">
-        <el-checkbox v-model="navigationHelpButton">navigationHelpButton</el-checkbox>
-      </div>
-      <div class="item">
-        <el-checkbox v-model="animation">animation</el-checkbox>
-      </div>
-      <div class="item">
-        <el-checkbox v-model="creditContainer">creditContainer</el-checkbox>
-      </div>
-      <div class="item">
-        <el-checkbox v-model="timeline">timeline</el-checkbox>
-      </div>
-      <div class="item">
-        <el-checkbox v-model="fullscreenButton">fullscreenButton</el-checkbox>
-      </div>
+    <div class="tips">
+      提示：点击显示或隐藏控件
     </div>
   </div>
-  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
-  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.97/Build/Cesium/Cesium.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.17"></script>
   <script>
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
     const viewer = new Cesium.Viewer("cesiumContainer", {
@@ -86,50 +60,51 @@
     })
   </script>
   <script>
-    new Vue({
-      el: '#app',
-      data: function () {
-        return {
-          geocoder: true,
-          homeButton: true,
-          sceneModePicker: true,
-          // baseLayerPicker: true,
-          navigationHelpButton: true,
-          animation: true,
-          creditContainer: true,
-          timeline: true,
-          fullscreenButton: true,
-        }
-      },
-      watch: {
-        geocoder(value) {
-          document.getElementsByClassName('cesium-viewer-geocoderContainer')[0].style.display = value ? "inline-block" : "none"
-        },
-        homeButton(value) {
-          document.getElementsByClassName('cesium-home-button')[0].style.display = value ? "inline-block" : "none"
-        },
-        sceneModePicker(value) {
-          document.getElementsByClassName('cesium-sceneModePicker-wrapper')[0].style.display = value ? "inline-block" : "none"
-        },
-        // baseLayerPicker(value) {
-        //   document.getElementsByClassName('cesium-toolbar-button')[0].style.display = value ? "inline-block" : "none"
-        // },
-        navigationHelpButton(value) {
-          document.getElementsByClassName('cesium-navigationHelpButton-wrapper')[0].style.display = value ? "inline-block" : "none"
-        },
-        animation(value) {
-          document.getElementsByClassName('cesium-viewer-animationContainer')[0].style.display = value ? "inline-block" : "none"
-        },
-        timeline(value) {
-          document.getElementsByClassName('cesium-timeline-main')[0].style.display = value ? "inline-block" : "none"
-        },
-        fullscreenButton(value) {
-          document.getElementsByClassName('cesium-viewer-fullscreenContainer')[0].style.display = value ? "inline-block" : "none"
-        },
-        creditContainer(value) {
-          document.getElementsByClassName('cesium-viewer-bottom')[0].style.display = value ? "inline-block" : "none"
-        },
-      },
+    // lil-gui
+    const gui = new lil.GUI();
+    const controls = {
+      geocoder: true,
+      homeButton: true,
+      sceneModePicker: true,
+      navigationHelpButton: true,
+      animation: true,
+      creditContainer: true,
+      timeline: true,
+      fullscreenButton: true,
+    }
+
+    let geocoderDisplay = document.getElementsByClassName('cesium-viewer-geocoderContainer')[0]
+    let homeButtonDisplay = document.getElementsByClassName('cesium-home-button')[0]
+    let sceneModePickerDisplay = document.getElementsByClassName('cesium-sceneModePicker-wrapper')[0]
+    let navigationHelpButtonDisplay = document.getElementsByClassName('cesium-navigationHelpButton-wrapper')[0]
+    let animationDisplay = document.getElementsByClassName('cesium-viewer-animationContainer')[0]
+    let creditContainerDisplay = document.getElementsByClassName('cesium-viewer-bottom')[0]
+    let timelineDisplay = document.getElementsByClassName('cesium-timeline-main')[0]
+    let fullscreenButtonDisplay = document.getElementsByClassName('cesium-viewer-fullscreenContainer')[0]
+
+    gui.add(controls, 'geocoder').onChange((e) => {
+      geocoderDisplay.style.display = e ? "inline-block" : "none"
+    })
+    gui.add(controls, 'homeButton').onChange((e) => {
+      homeButtonDisplay.style.display = e ? "inline-block" : "none"
+    })
+    gui.add(controls, 'sceneModePicker').onChange((e) => {
+      sceneModePickerDisplay.style.display = e ? "inline-block" : "none"
+    })
+    gui.add(controls, 'navigationHelpButton').onChange((e) => {
+      navigationHelpButtonDisplay.style.display = e ? "inline-block" : "none"
+    })
+    gui.add(controls, 'animation').onChange((e) => {
+      animationDisplay.style.display = e ? "inline-block" : "none"
+    })
+    gui.add(controls, 'creditContainer').onChange((e) => {
+      creditContainerDisplay.style.display = e ? "inline-block" : "none"
+    })
+    gui.add(controls, 'timeline').onChange((e) => {
+      timelineDisplay.style.display = e ? "inline-block" : "none"
+    })
+    gui.add(controls, 'fullscreenButton').onChange((e) => {
+      fullscreenButtonDisplay.style.display = e ? "inline-block" : "none"
     })
   </script>
 </body>
