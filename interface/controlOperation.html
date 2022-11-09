@@ -82,28 +82,28 @@
     let timelineDisplay = document.getElementsByClassName('cesium-timeline-main')[0]
     let fullscreenButtonDisplay = document.getElementsByClassName('cesium-viewer-fullscreenContainer')[0]
 
-    gui.add(controls, 'geocoder').onChange((e) => {
+    gui.add(controls, 'geocoder').name('查找位置').onChange((e) => {
       geocoderDisplay.style.display = e ? "inline-block" : "none"
     })
-    gui.add(controls, 'homeButton').onChange((e) => {
+    gui.add(controls, 'homeButton').name('返回视角到初始位置').onChange((e) => {
       homeButtonDisplay.style.display = e ? "inline-block" : "none"
     })
-    gui.add(controls, 'sceneModePicker').onChange((e) => {
+    gui.add(controls, 'sceneModePicker').name('视角模式').onChange((e) => {
       sceneModePickerDisplay.style.display = e ? "inline-block" : "none"
     })
-    gui.add(controls, 'navigationHelpButton').onChange((e) => {
+    gui.add(controls, 'navigationHelpButton').name('帮助').onChange((e) => {
       navigationHelpButtonDisplay.style.display = e ? "inline-block" : "none"
     })
-    gui.add(controls, 'animation').onChange((e) => {
+    gui.add(controls, 'animation').name('动画速度控制器').onChange((e) => {
       animationDisplay.style.display = e ? "inline-block" : "none"
     })
-    gui.add(controls, 'creditContainer').onChange((e) => {
+    gui.add(controls, 'creditContainer').name('版权信息').onChange((e) => {
       creditContainerDisplay.style.display = e ? "inline-block" : "none"
     })
-    gui.add(controls, 'timeline').onChange((e) => {
+    gui.add(controls, 'timeline').name('时间轴').onChange((e) => {
       timelineDisplay.style.display = e ? "inline-block" : "none"
     })
-    gui.add(controls, 'fullscreenButton').onChange((e) => {
+    gui.add(controls, 'fullscreenButton').name('全屏按钮').onChange((e) => {
       fullscreenButtonDisplay.style.display = e ? "inline-block" : "none"
     })
   </script>
