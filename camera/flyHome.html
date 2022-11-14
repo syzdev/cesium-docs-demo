@@ -5,7 +5,6 @@
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <title>flyHome</title>
-  <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/element-ui/2.15.7/theme-chalk/index.min.css">
   <link rel='stylesheet' href='https://cesium.com/downloads/cesiumjs/releases/1.97/Build/Cesium/Widgets/widgets.css'>
   <style>
     html,
@@ -18,51 +17,62 @@
       overflow: hidden;
     }
 
-    #app {
-      padding: 20px;
-      width: 225px;
+    .tips {
+      width: 180px;
       position: absolute;
-      left: 10px;
       top: 10px;
+      left: 10px;
+      font-size: 14px;
       z-index: 999;
-      color: #fff;
-      background-color: rgba(40, 44, 50, 0.9);
-      border-radius: 10px;
+      color: #ebebeb;
+      background-color: #1f1f1f;
+      border-radius: 2px;
+      padding: 4px;
+      user-select: none;
+    }
+
+    .lil-gui {
+      --width: 180px;
+      --name-width: 85%;
+    }
+
+    .lil-gui.autoPlace {
+      top: 85px;
+      left: 10px;
     }
   </style>
 </head>
 
 <body>
   <div id="cesiumContainer">
-    <div id="app">
-      <div>提示：转动离开初始相机视角后，调整duration，再点击flyHome</div><br>
-      <el-input-number v-model="duration" :min="1" :max="5" label="duration" size="small"></el-input-number>
-      <el-button type="primary" @click="flyHome" size="small">flyHome</el-button>
+    <div class="tips">
+      提示：转动离开初始相机视角后，调整duration，再点击flyHome
     </div>
   </div>
-  <script src="https://lib.baomitu.com/vue/2.6.14/vue.min.js"></script>
-  <script src="https://lib.baomitu.com/element-ui/2.15.7/index.min.js"></script>
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.97/Build/Cesium/Cesium.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.17"></script>
   <script>
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YmRiNjM4MC1kMDZkLTQ2NDQtYjQ3My0xZDI4MDU0MGJhZDciLCJpZCI6MzIxMzAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTY1MjM4NzZ9.A3FBZ6HjKkTsOGnjwWWeO9L10HQ9c-wcF4c3dtTc4gQ'
     const viewer = new Cesium.Viewer("cesiumContainer", {
       imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
         url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
-      })
+      }),
+      animation: false,
+      timeline: false
     })
   </script>
   <script>
-    new Vue({
-      el: '#app',
-      data: function () {
-        return { duration: 3 }
-      },
-      methods: {
-        flyHome() {
-          viewer.camera.flyHome(this.duration)
-        }
-      },
-    })
+    // lil-gui
+    const gui = new lil.GUI();
+    const controls = {
+      duration: 3,
+      flyHome: function () {
+        viewer.camera.flyHome(this.duration)
+      }
+    }
+
+    gui.add(controls, 'duration')
+    gui.add(controls, 'flyHome')
   </script>
 </body>
 
